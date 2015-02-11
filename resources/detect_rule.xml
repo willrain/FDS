@@ -1,0 +1,156 @@
+<?xml version='1.0'?> 
+<rules>
+	<rule>
+		<num>1</num>
+		<use_yn>Y</use_yn>
+		<title>적립금 유효기간 검사</title>		
+		<desc>유효 종료일이 등록일 보다 이전인 경우 검출</desc>		
+		<index>mileage-2015*</index>
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}},{"term":{"milg_api.milgInfo.MilgProcCd":"10"}},{"range":{"milg_api.milgInfo.EffEndDt":{"lt":"%{TO_DAY}%"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>30</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+	<rule>
+		<num>2</num>
+		<use_yn>Y</use_yn>
+		<title>S머니 적립금액 검사</title>
+		<desc>S머니 적립금액이 10만원 초과인 경우 검출</desc>
+		<index>mileage-2015*</index>
+		<!-- MilgDtlRsnCd":"411" 은 예외 .. 기출하 / 한진사고건  --> 
+		<query> 
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}},{"term":{"milg_api.milgInfo.MilgKindCd":"500"}},{"term":{"milg_api.milgInfo.MilgProcCd":"10"}},{"range":{"milg_api.milgInfo.MilgAmt":{"gt":"100000"}}}],"must_not":[{"term":{"milg_api.milgInfo.MilgDtlRsnCd":"411"}}],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>30</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+	<rule>
+		<num>3</num>
+		<use_yn>Y</use_yn>
+		<title>예치금 적립금액 검사</title>
+		<desc>예치금 적립금액이 50만원 초과인 경우 검출</desc>
+		<!-- MilgDtlRsnCd":"801" 예치금 환불은 예외 처리 --> 
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}},{"term":{"milg_api.milgInfo.MilgKindCd":"510"}},{"term":{"milg_api.milgInfo.MilgProcCd":"10"}},{"range":{"milg_api.milgInfo.MilgAmt":{"gt":"500000"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>30</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+	<rule>
+		<num>4</num>
+		<use_yn>Y</use_yn>
+		<title>지원금 적립금액 검사</title>
+		<desc>지원금 적립금액이 20만원 초과인 경우 검출</desc>
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}},{"term":{"milg_api.milgInfo.MilgKindCd":"520"}},{"term":{"milg_api.milgInfo.MilgProcCd":"10"}},{"range":{"milg_api.milgInfo.MilgAmt":{"gt":"200000"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>30</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+	<rule>
+		<num>5</num>
+		<use_yn>Y</use_yn>
+		<title>전환금 적립금액 검사</title>
+		<desc>
+			신세계상품권/삼성상품권/기프트카드/모바일기프트카드 전환금 적립금액이 50만원 초과인 경우 검출
+		</desc>
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}},{"terms":{"milg_api.milgInfo.MilgKindCd":["540","550","560","570"]}},{"term":{"milg_api.milgInfo.MilgProcCd":"10"}},{"range":{"milg_api.milgInfo.MilgAmt":{"gt":"500000"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>30</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+
+
+
+
+	<!-- 시간별 --> 
+	<!-- 일별 --> 
+	<!-- 
+		FrontUserInfo loginRemoteAddress 별 로그인아이디 확인 
+		CsoUserInfo  아이피 대역 확인 
+		중복 예치금 환불 
+		
+	-->
+
+
+
+
+
+
+	<rule>
+		<num>6</num>
+		<use_yn>N</use_yn>
+		<title>중복 적립요청 검사</title>
+		<desc>중복 적립 요청 확인 </desc>
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"term":{"milg_api.milgInfo.MilgKindCd":"520"}},{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>60</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+	<rule>
+		<num>7</num>
+		<use_yn>N</use_yn>
+		<title>중복 사용 검사</title>
+		<desc>??? 어떻게 확인하지 ? </desc>
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"term":{"milg_api.milgInfo.MilgKindCd":"520"}},{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>60</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+
+	<rule>
+		<num>8</num>
+		<use_yn>N</use_yn>
+		<title>일별 최대 적립 top 100 확인 </title>
+		<desc>??? 어떻게 확인하지 ? </desc>
+		<query>
+		<![CDATA[ 
+		{"query":{"bool":{"must":[{"term":{"milg_api.milgInfo.MilgKindCd":"520"}},{"range":{"milg_api.userInfo.timestamp":{"gte":"0000000000000"}}}],"must_not":[],"should":[]}},"from":0,"size":1,"sort":[],"facets":{}}
+		]]>
+		</query> 		
+		<interval>60</interval> 
+		<level>WARN</level>
+		<alarm>EMAIL</alarm>
+		<user>135224</user>
+	</rule>
+
+</rules> 

@@ -1,0 +1,15 @@
+<?xml version='1.0'?> 
+<users>
+	<user empno="135224">
+		<emp_no>135224</emp_no>
+		<name>윤승환</name>
+		<email>willrain@emart.com</email>
+		<phone>01062448579</phone>
+	</user>
+	<user empno="145734">
+		<emp_no>145734</emp_no>
+		<name>최시원</name>
+		<email>siwonchoi@emart.com</email>
+		<phone>01052882528</phone>
+	</user>
+</users>
